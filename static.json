@@ -1,0 +1,7 @@
+{
+  "root": "dist/siemens-weather",
+  "clean_urls": true,
+  "routes": {
+    "/**": "index.html"
+  }
+}
