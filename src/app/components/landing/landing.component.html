@@ -1,5 +1,5 @@
-<div class="container d-flex flex-column align-items-center w-sm-100">
-  <div class="search-bar d-flex justify-content-center mb-4 w-100">
+<div class="container d-flex flex-column align-items-center">
+  <div class="search-bar d-flex justify-content-center mb-3 w-100 weather-card">
     <input [(ngModel)]="searchCity" class="form-control me-5" placeholder="Enter city">
     <button (click)="searchWeather()" class="btn btn-warning">Search</button>
   </div>
@@ -65,7 +65,7 @@
   <!-- Historical Data Chart -->
   <div class="weather-card col-12 d-flex flex-column align-items-center">
     <div class="text-center">
-      <div class="chart-title">Historical Weather Data</div>
+      <h2 class="chart-title">Historical Weather Data</h2>
       <figure id="chart">
         <svg width="100%" height="200"></svg>
       </figure>
