@@ -3,7 +3,7 @@
   min-height: 100vh;
   background: linear-gradient(to bottom, #c2ac7a, #122f47); /* Sky blue gradient */
   background-size: cover;
-  color: var(--text-color, #ffffff);
+  color: #ffffff;
   font-family: 'Roboto', sans-serif;
   padding: 20px;
   box-sizing: border-box;
@@ -125,9 +125,51 @@
   background-color: green;
 }
 
+.weather-card svg {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  /*background-color: lightskyblue;*/
+  padding-bottom: 5px;
+  padding-top: 5px;
+  border-radius: 20px;
+}
+
+.date-number {
+  font-size: 60px;
+
+text-align: center;
+}
+
+.card-container{
+  padding:3px;
+}
+
+.wind-speed{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
 
 @media screen and (max-width: 500px) {
   .container {
     width: 100%;
   }
 }
+@media screen and (max-width: 768px) {
+
+
+  .humadity-text , .wind-text  {
+    font-size: 12px ;
+  }
+
+  .card-container{
+    padding: 2px;
+  }
+
+  .weather-card{
+  margin-bottom: 0;
+  }
+
+}
+

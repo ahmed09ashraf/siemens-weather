@@ -5,6 +5,8 @@ import {isPlatformBrowser, NgClass, NgIf} from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 import { FormsModule } from "@angular/forms";
 import * as d3 from 'd3';
+import moment from 'moment';
+
 
 @Component({
   selector: 'app-landing',
@@ -24,6 +26,10 @@ export class LandingComponent implements OnInit {
   weatherStats: any[] = [];
   temperatureUnit: string = 'C';
 
+  dayOfWeek: string = '';
+  dayOfMonth: string = '';
+  month: string = '';
+
 
   constructor(
     private weatherService: WeatherService,
@@ -35,11 +41,20 @@ export class LandingComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       this.getUserLocation();
     }
+    this.initializeDate();
+  }
+
+  initializeDate(): void {
+    const today = moment();
+    this.dayOfWeek = today.format('dddd');
+    this.dayOfMonth = today.format('D');
+    this.month = today.format('MMM');
   }
 
   setTemperatureUnit(unit: string): void {
     this.temperatureUnit = unit;
   }
+
 
 
   getUserLocation(): void {

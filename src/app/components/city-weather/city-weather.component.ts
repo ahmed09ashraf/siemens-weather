@@ -4,6 +4,7 @@ import { WeatherService } from '../../services/weather.service';
 import * as d3 from 'd3';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
+import moment from "moment/moment";
 
 @Component({
   selector: 'app-city-weather',
@@ -16,7 +17,11 @@ export class CityWeatherComponent implements OnInit {
   cityName!: string;
   currentWeather: any = {};
   weatherStats: any[] = [];
-  temperatureUnit: string = 'C'; // Default to Celsius
+  temperatureUnit: string = 'C';
+
+  dayOfWeek: string = '';
+  dayOfMonth: string = '';
+  month: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -28,6 +33,14 @@ export class CityWeatherComponent implements OnInit {
   ngOnInit(): void {
     this.cityName = this.route.snapshot.paramMap.get('cityName') || '';
     this.getWeatherData(this.cityName);
+    this.initializeDate();
+  }
+
+  initializeDate(): void {
+    const today = moment();
+    this.dayOfWeek = today.format('dddd');
+    this.dayOfMonth = today.format('D');
+    this.month = today.format('MMM');
   }
 
   setTemperatureUnit(unit: string): void {
