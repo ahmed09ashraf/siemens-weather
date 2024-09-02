@@ -1,0 +1,133 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #c2ac7a, #122f47); /* Sky blue gradient */
+  background-size: cover;
+  color: var(--text-color, #ffffff);
+  font-family: 'Roboto', sans-serif;
+  padding: 20px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.container {
+  width: 35% ;
+}
+
+
+.weather-app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 15px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.7);
+  max-width: 700px;
+  margin: auto;
+  transition: all 0.5s ease;
+}
+
+.weather-app-header h1 {
+  margin-bottom: 30px;
+  font-size: 36px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.location-input {
+  display: flex;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 40px;
+}
+
+.location-input input {
+  padding: 15px 20px;
+  border: 2px solid #444;
+  border-radius: 10px 0 0 10px;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #333;
+  flex-grow: 1;
+  transition: background-color 0.3s ease;
+}
+
+.location-input button {
+  padding: 15px 30px;
+  color: #000;
+  border: none;
+  border-radius: 0 10px 10px 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+
+.weather-summary {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.weather-card {
+  background: linear-gradient(145deg, #3a7bd5, #3a6073);
+  border-radius: 15px;
+  padding: 30px;
+  transition: all 0.5s ease;
+}
+
+.weather-card:hover {
+  transform: translateY(-10px) scale(1.02);
+}
+
+.weather-icon img {
+  width: 100px;
+  margin-bottom: 10px;
+  animation: fadeIn 1s ease;
+}
+
+.weather-info h3 {
+  font-size: 64px;
+  margin: 20px 0;
+}
+
+.weather-info p {
+  margin: 8px 0;
+  font-size: 20px;
+  opacity: 0.9;
+}
+
+.humadity-text , .wind-text  {
+  font-size: 20px ;
+}
+.temp {
+  font-size: 40px;
+}
+
+
+
+.temperature-toggle {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.toggle-btn {
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 3px;
+  background-color: transparent;
+  color: white;
+  font-size: 14px;
+  border: 1px solid #c2ac7a;
+}
+
+.toggle-btn.selected {
+  background-color: green;
+}
+
+
+@media screen and (max-width: 500px) {
+  .container {
+    width: 100%;
+  }
+}
