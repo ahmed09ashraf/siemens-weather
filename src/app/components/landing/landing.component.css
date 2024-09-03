@@ -73,6 +73,8 @@
   border-radius: 15px;
   padding: 30px;
   transition: all 0.5s ease;
+  height: 100%;
+
 }
 
 .weather-card:hover {
@@ -135,7 +137,7 @@
 }
 
 .date-number {
-  font-size: 60px;
+  font-size: 50px;
 
 text-align: center;
 }

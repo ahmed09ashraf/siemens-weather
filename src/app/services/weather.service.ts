@@ -19,7 +19,7 @@ export class WeatherService {
       .set('q', cityName)
       .set('key', this.apiKey)
       .set('format', 'json')
-      .set('num_of_days', '5');
+      .set('num_of_days', '7');
 
     return this.http.get(url, { params });
   }

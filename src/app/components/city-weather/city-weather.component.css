@@ -3,7 +3,7 @@
   min-height: 100vh;
   background: linear-gradient(to bottom, #c2ac7a, #122f47);
   background-size: cover;
-  color: var(--text-color, #ffffff);
+  color: #ffffff;
   padding: 20px;
   box-sizing: border-box;
   transition: all 0.3s ease;
@@ -19,6 +19,8 @@
   border-radius: 15px;
   padding: 30px;
   transition: all 0.5s ease;
+  height: 100%;
+
 }
 
 .weather-card:hover {
@@ -49,7 +51,7 @@
 }
 
 .date-number {
-  font-size: 60px;
+  font-size: 50px;
   text-align: center;
 }
 
