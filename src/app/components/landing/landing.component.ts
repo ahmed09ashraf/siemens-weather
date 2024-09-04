@@ -7,6 +7,7 @@ import { FormsModule } from "@angular/forms";
 import * as d3 from 'd3';
 import moment from 'moment';
 
+
 @Component({
   selector: 'app-landing',
   standalone: true,
@@ -28,6 +29,7 @@ export class LandingComponent implements OnInit {
   dayOfWeek: string = '';
   dayOfMonth: string = '';
   month: string = '';
+
 
   constructor(
     private weatherService: WeatherService,
@@ -53,67 +55,49 @@ export class LandingComponent implements OnInit {
     this.temperatureUnit = unit;
   }
 
-  /**
-   * Get the user's geolocation and fetch weather data based on the coordinates
-   */
+
+
   getUserLocation(): void {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        console.log(`Geolocation success: Lat ${lat}, Lon ${lon}`); // Log geolocation success
+    navigator.geolocation.getCurrentPosition((position) => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
 
-        // Fetch city name based on geolocation coordinates
-        this.weatherService.getCityNameFromCoordinates(lat, lon).subscribe(
-          (cityName) => {
-            console.log(`City name retrieved: ${cityName}`); // Log city name
-            this.currentCity = cityName;
-            this.getWeatherForCity(cityName); // Fetch weather for the city
-          },
-          (error: any) => {
-            console.error('Error fetching city name', error); // Log error
-            this.currentCity = `Lat ${lat.toFixed(2)}, Lon ${lon.toFixed(2)}`; // Fallback to coordinates
-          }
-        );
-      },
-      (error) => {
-        console.error('Geolocation error:', error); // Log geolocation error
-
-        // If geolocation fails, display a message to the user to use search
-        alert('Unable to access your location. Please use the search bar to find your city.');
-      }
-    );
-  }
-
-  /**
-   * Fetch weather data for the given city name
-   */
-  getWeatherForCity(cityName: string): void {
-    this.weatherService.getWeather(cityName).subscribe(
-      (data) => {
-        console.log('Weather data retrieved:', data); // Log weather data
-        if (data && data.data && data.data.current_condition && data.data.weather) {
-          this.currentWeather = data.data.current_condition[0];
-          this.weatherStats = data.data.weather.map((d: any) => ({
-            date: new Date(d.date),
-            avgTemp: +d.avgtempC,
-          }));
-          this.createChart();
-        } else {
-          console.error('Unexpected weather API response structure', data);
+      this.weatherService.getCityNameFromCoordinates(lat, lon).subscribe(
+        (cityName) => {
+          this.currentCity = cityName;
+          this.weatherService.getWeather(this.currentCity).subscribe(
+            (data) => {
+              if (data && data.data && data.data.current_condition && data.data.weather) {
+                this.currentWeather = data.data.current_condition[0];
+                this.weatherStats = data.data.weather.map((d: any) => ({
+                  date: new Date(d.date),
+                  avgTemp: +d.avgtempC,
+                }));
+                this.createChart();
+              } else {
+                console.error('Unexpected API response structure', data);
+                this.currentWeather = null;
+              }
+            },
+            (error: any) => {
+              console.error('Error fetching weather data', error);
+              this.currentWeather = null;
+            }
+          );
+        },
+        (error: any) => {
+          console.error('Error fetching city name', error);
+          this.currentCity = `Lat ${lat.toFixed(2)} and Lon ${lon.toFixed(2)}`; // Fallback to coordinates if API fails
           this.currentWeather = null;
         }
-      },
-      (error: any) => {
-        console.error('Error fetching weather data', error); // Log weather API error
-        this.currentWeather = null;
-      }
-    );
+      );
+    });
   }
 
-  /**
-   * Create a weather chart using D3.js
-   */
+  searchWeather(): void {
+    this.router.navigate(['/city', this.searchCity]);
+  }
+
   private createChart(): void {
     if (!this.weatherStats || this.weatherStats.length === 0) {
       return; // Exit if there's no data to plot
@@ -139,11 +123,11 @@ export class LandingComponent implements OnInit {
       .range([height, 0]);
 
     const xAxis = d3.axisBottom(x)
-      .ticks(data.length)
+      .ticks(data.length)  // Adjust the number of ticks to fit your data
       .tickFormat((domainValue, index) => {
         const date = domainValue instanceof Date ? domainValue : new Date(domainValue.valueOf());
         if (index === data.length - 1) {
-          return d3.timeFormat('%b')(date); // Display month name at the end
+          return d3.timeFormat('%b')(date); // Display month name only at the end
         }
         return d3.timeFormat('%d')(date); // Display day of the month for other ticks
       });
