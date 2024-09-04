@@ -91,4 +91,36 @@
     </div>
   </div>
 
+  <!-- Favorite Cities Section with Drag and Drop -->
+  <div class="d-flex flex-wrap justify-content-start col-md-12 py-1" *ngIf="favoriteCities.length">
+    <div
+      *ngFor="let city of favoriteCities; let i = index"
+      class="card-container col-12 col-md-4 mb-3"
+      [ngClass]="{'moving': placeholderIndex === i}"
+      draggable="true"
+      (dragstart)="onDragStart($event, i)"
+      (dragover)="onDragOver($event, i)"
+      (dragend)="onDragEnd($event)"
+      (drop)="onDrop($event, i)"
+    >
+      <div class="weather-card col-12 position-relative" style="cursor: pointer;">
+        <!-- Favorite button in the top-left corner -->
+        <button class="favorite-btn" (click)="removeFromFavorites(city.name); $event.stopPropagation();" style="position: absolute; top: 10px; left: 10px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icon-tabler-heart filled">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"></path>
+          </svg>
+        </button>
+
+        <!-- City Details -->
+        <div class="d-flex flex-column justify-content-between align-items-center text-center mt-4">
+          <h3 style="text-transform: capitalize;">{{ city.name }}</h3>
+          <h3 class="details col-12 mt-2">{{ city.temperatureC }} °C</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
 </div>

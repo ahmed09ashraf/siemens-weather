@@ -68,18 +68,47 @@
   text-align: center;
 }
 
+/* Layout correction for row and wrapping */
+.d-flex.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.card-container {
+  transition: transform 0.3s ease; /* Smooth transition for moving cards */
+}
+
+.moving {
+  opacity: 0.8;
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out;
+}
+
 .weather-card {
   background: linear-gradient(145deg, #3a7bd5, #3a6073);
   border-radius: 15px;
   padding: 30px;
   transition: all 0.5s ease;
   height: 100%;
-
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for cards */
 }
 
-.weather-card:hover {
-  transform: translateY(-10px) scale(1.02);
+.weather-card.dragging {
+  opacity: 0.5;
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  z-index: 1000;
+  border-radius: 10px;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+  cursor: move;
 }
+
+/* Ensures smooth transition for the other cards during drag */
+.card-container.moving {
+  transform: translate(0, 0); /* Move cards smoothly during drag */
+}
+
 
 .weather-icon img {
   width: 100px;
@@ -135,6 +164,41 @@
   padding-top: 5px;
   border-radius: 20px;
 }
+
+
+.favorite-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.favorite-btn svg {
+  transition: stroke 0.3s ease-in-out;
+}
+
+.favorite-btn.saved svg {
+  fill: white;
+  stroke: white;
+}
+
+.favorite-btn svg:hover {
+  stroke: #ffcc00;
+}
+
+.favorite-btn svg.filled {
+  fill: white;
+  stroke: white;
+}
+
+.favorite-btn svg:hover {
+  stroke: #ffcc00;
+}
+
+
 
 .date-number {
   font-size: 50px;

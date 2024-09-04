@@ -1,12 +1,11 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { WeatherService } from '../../services/weather.service';
 import { Router } from '@angular/router';
-import {isPlatformBrowser, NgClass, NgIf} from '@angular/common';
+import {isPlatformBrowser, NgClass, NgForOf, NgIf} from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 import { FormsModule } from "@angular/forms";
 import * as d3 from 'd3';
 import moment from 'moment';
-
 
 @Component({
   selector: 'app-landing',
@@ -15,7 +14,8 @@ import moment from 'moment';
   imports: [
     FormsModule,
     NgIf,
-    NgClass
+    NgClass,
+    NgForOf
   ],
   styleUrls: ['./landing.component.css']
 })
@@ -25,11 +25,15 @@ export class LandingComponent implements OnInit {
   searchCity: string = '';
   weatherStats: any[] = [];
   temperatureUnit: string = 'C';
+  favoriteCities: any[] = [];
+  draggedCityIndex: number | null = null;
+  dragOverIndex: number | null = null;
+  placeholderIndex: number | null = null;
+
 
   dayOfWeek: string = '';
   dayOfMonth: string = '';
   month: string = '';
-
 
   constructor(
     private weatherService: WeatherService,
@@ -42,11 +46,12 @@ export class LandingComponent implements OnInit {
       this.getUserLocation();
     }
     this.initializeDate();
+    this.loadFavorites();
   }
 
   initializeDate(): void {
     const today = moment();
-    this.dayOfWeek = today.format('dddd');
+    this.dayOfWeek = today.format('ddd');
     this.dayOfMonth = today.format('D');
     this.month = today.format('MMM');
   }
@@ -55,6 +60,78 @@ export class LandingComponent implements OnInit {
     this.temperatureUnit = unit;
   }
 
+  // Load favorite cities from localStorage
+  loadFavorites(): void {
+    this.favoriteCities = JSON.parse(localStorage.getItem('favorites') || '[]');
+  }
+
+  // Add or remove a city from favorites (this works similarly to CityWeatherComponent)
+  toggleFavorite(cityName: string): void {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    const isFavorite = favorites.some((city: any) => city.name === cityName);
+
+    if (isFavorite) {
+      // Remove from favorites
+      const updatedFavorites = favorites.filter((city: any) => city.name !== cityName);
+      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      this.favoriteCities = updatedFavorites;
+    } else {
+      // Add to favorites
+      this.weatherService.getWeather(cityName).subscribe((data) => {
+        const currentWeather = data?.data?.current_condition?.[0];
+        favorites.push({
+          name: cityName,
+          temperatureC: currentWeather?.temp_C,
+          temperatureF: currentWeather?.temp_F,
+        });
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        this.favoriteCities = favorites;
+      });
+    }
+  }
+
+
+  onDragStart(event: DragEvent, index: number): void {
+    this.draggedCityIndex = index;
+
+    const element = (event.target as HTMLElement);
+    element.style.opacity = '0.7'; // Reduce opacity for the original card during drag
+    element.classList.add('dragging-card'); // Add dragging class for visual effect
+  }
+
+  onDragEnd(event: DragEvent): void {
+    const element = event.target as HTMLElement;
+    element.style.opacity = '1'; // Reset opacity after dragging
+    element.classList.remove('dragging-card'); // Remove dragging class
+    this.draggedCityIndex = null; // Reset drag index
+    this.placeholderIndex = null;
+  }
+
+  onDragOver(event: DragEvent, index: number): void {
+    event.preventDefault(); // Allow drop
+    this.placeholderIndex = index; // Set index for where to drop
+  }
+
+  onDrop(event: DragEvent, dropIndex: number): void {
+    event.preventDefault();
+    const draggedIndex = this.draggedCityIndex;
+    if (draggedIndex !== null) {
+      const draggedCity = this.favoriteCities[draggedIndex];
+      this.favoriteCities.splice(draggedIndex, 1); // Remove from original position
+      this.favoriteCities.splice(dropIndex, 0, draggedCity); // Insert in new position
+      localStorage.setItem('favorites', JSON.stringify(this.favoriteCities));
+    }
+    this.draggedCityIndex = null;
+    this.placeholderIndex = null;
+  }
+
+
+  // Remove a city from favorites
+  removeFromFavorites(cityName: string): void {
+    const updatedFavorites = this.favoriteCities.filter((city: any) => city.name !== cityName);
+    this.favoriteCities = updatedFavorites;
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+  }
 
 
   getUserLocation(): void {
@@ -122,19 +199,9 @@ export class LandingComponent implements OnInit {
       .domain([d3.min(data, d => d.value)! - 5, d3.max(data, d => d.value)! + 5])
       .range([height, 0]);
 
-    const xAxis = d3.axisBottom(x)
-      .ticks(data.length)  // Adjust the number of ticks to fit your data
-      .tickFormat((domainValue, index) => {
-        const date = domainValue instanceof Date ? domainValue : new Date(domainValue.valueOf());
-        if (index === data.length - 1) {
-          return d3.timeFormat('%b')(date); // Display month name only at the end
-        }
-        return d3.timeFormat('%d')(date); // Display day of the month for other ticks
-      });
-
     g.append('g')
       .attr('transform', `translate(0,${height})`)
-      .call(xAxis);
+      .call(d3.axisBottom(x));
 
     g.append('g')
       .call(d3.axisLeft(y));
@@ -157,5 +224,10 @@ export class LandingComponent implements OnInit {
       .attr('cy', d => y(d.value))
       .attr('r', 5)
       .attr('fill', '#ffcc00');
+  }
+
+  // Navigate to city from favorite card
+  navigateToCity(cityName: string): void {
+    this.router.navigate(['/city', cityName]);
   }
 }

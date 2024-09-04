@@ -1,6 +1,28 @@
 <div class="container d-flex flex-column align-items-center w-sm-100">
   <!-- City Name, Temperature, and Weather Icon -->
-  <div class="d-flex flex-row justify-content-around align-items-center weather-card col-12">
+  <div class="d-flex flex-row justify-content-around align-items-center weather-card col-12 position-relative">
+    <!-- Favorite button in the top-left corner -->
+    <button class="favorite-btn" (click)="addToFavorites()" style="position: absolute; top: 10px; left: 10px;">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="40"
+        height="40"
+        viewBox="0 0 24 24"
+        [ngClass]="isFavorite ? 'filled' : ''"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="icon icon-tabler icons-tabler-outline icon-tabler-heart"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+      </svg>
+    </button>
+
+
+
     <div class="col-md-4 col-sm-12 d-flex flex-column align-items-center text-center temp">
       <h1 style="text-transform: capitalize;">{{ cityName }}</h1>
       {{ temperatureUnit === 'C' ? currentWeather?.temp_C + ' °c' : currentWeather?.temp_F + ' °f' }}

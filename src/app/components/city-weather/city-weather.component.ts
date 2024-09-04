@@ -18,6 +18,8 @@ export class CityWeatherComponent implements OnInit {
   currentWeather: any = {};
   weatherStats: any[] = [];
   temperatureUnit: string = 'C';
+  isFavorite: boolean = false; // To track the favorite status
+
 
   dayOfWeek: string = '';
   dayOfMonth: string = '';
@@ -34,17 +36,44 @@ export class CityWeatherComponent implements OnInit {
     this.cityName = this.route.snapshot.paramMap.get('cityName') || '';
     this.getWeatherData(this.cityName);
     this.initializeDate();
+    this.checkIfFavorite();  // Check if the city is already a favorite
   }
 
   initializeDate(): void {
     const today = moment();
-    this.dayOfWeek = today.format('dddd');
+    this.dayOfWeek =today.format('ddd');
     this.dayOfMonth = today.format('D');
     this.month = today.format('MMM');
   }
 
   setTemperatureUnit(unit: string): void {
     this.temperatureUnit = unit;
+  }
+
+  addToFavorites(): void {
+      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+      if (this.isFavorite) {
+        // If already favorite, remove it
+        const updatedFavorites = favorites.filter((city: any) => city.name !== this.cityName);
+        localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      } else {
+        // Add to favorites
+        favorites.push({
+          name: this.cityName,
+          temperatureC: this.currentWeather?.temp_C,
+          temperatureF: this.currentWeather?.temp_F ,
+        });
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+      }
+
+      this.isFavorite = !this.isFavorite;
+    }
+
+  // Check if the current city is already a favorite
+  checkIfFavorite(): void {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    this.isFavorite = favorites.some((city: any) => city.name === this.cityName);
   }
 
   getWeatherData(cityName: string): void {
@@ -70,6 +99,7 @@ export class CityWeatherComponent implements OnInit {
     );
   }
 
+
   private createChart(): void {
     if (!this.weatherStats || this.weatherStats.length === 0) {
       return; // Exit if there's no data to plot
@@ -94,20 +124,9 @@ export class CityWeatherComponent implements OnInit {
       .domain([d3.min(data, d => d.value)! - 5, d3.max(data, d => d.value)! + 5])
       .range([height, 0]);
 
-    // Custom tick format for the x-axis
-    const xAxis = d3.axisBottom(x)
-      .ticks(data.length)  // Adjust the number of ticks to fit your data
-      .tickFormat((domainValue, index) => {
-        const date = domainValue instanceof Date ? domainValue : new Date(domainValue.valueOf());
-        if (index === data.length - 1) {
-          return d3.timeFormat('%b')(date); // Display month name only at the end
-        }
-        return d3.timeFormat('%d')(date); // Display day of the month for other ticks
-      });
-
     g.append('g')
       .attr('transform', `translate(0,${height})`)
-      .call(xAxis);
+      .call(d3.axisBottom(x));
 
     g.append('g')
       .call(d3.axisLeft(y));
@@ -131,7 +150,4 @@ export class CityWeatherComponent implements OnInit {
       .attr('r', 5)
       .attr('fill', '#ffcc00');
   }
-
-
-
 }

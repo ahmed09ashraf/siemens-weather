@@ -96,6 +96,38 @@
   justify-content: center;
 }
 
+.favorite-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.favorite-btn svg {
+  transition: stroke 0.3s ease-in-out;
+}
+
+.favorite-btn.saved svg {
+  fill: white;
+  stroke: white;
+}
+
+.favorite-btn svg:hover {
+  stroke: #ffcc00;
+}
+
+.favorite-btn svg.filled {
+  fill: white;
+  stroke: white;
+}
+
+.favorite-btn svg:hover {
+  stroke: #ffcc00;
+}
+
 
 @media screen and (max-width: 500px) {
   .container {
