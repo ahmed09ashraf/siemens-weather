@@ -58,96 +58,41 @@ export class LandingComponent implements OnInit {
 
 
   getUserLocation(): void {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        console.log(`Geolocation success: Lat ${lat}, Lon ${lon}`); // Log lat/lon
+    navigator.geolocation.getCurrentPosition((position) => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
 
-        this.weatherService.getCityNameFromCoordinates(lat, lon).subscribe(
-          (cityName) => {
-            console.log(`City name retrieved: ${cityName}`); // Log city name
-            this.currentCity = cityName;
-
-            // Fetch weather data for the retrieved city
-            this.weatherService.getWeather(this.currentCity).subscribe(
-              (data) => {
-                if (data && data.data && data.data.current_condition && data.data.weather) {
-                  this.currentWeather = data.data.current_condition[0];
-                  this.weatherStats = data.data.weather.map((d: any) => ({
-                    date: new Date(d.date),
-                    avgTemp: +d.avgtempC,
-                  }));
-                  console.log('Weather data retrieved successfully:', this.currentWeather); // Log weather data
-                  this.createChart();
-                } else {
-                  console.error('Unexpected API response structure', data);
-                  this.currentWeather = null;
-                }
-              },
-              (error: any) => {
-                console.error('Error fetching weather data', error); // Log weather API error
+      this.weatherService.getCityNameFromCoordinates(lat, lon).subscribe(
+        (cityName) => {
+          this.currentCity = cityName;
+          this.weatherService.getWeather(this.currentCity).subscribe(
+            (data) => {
+              if (data && data.data && data.data.current_condition && data.data.weather) {
+                this.currentWeather = data.data.current_condition[0];
+                this.weatherStats = data.data.weather.map((d: any) => ({
+                  date: new Date(d.date),
+                  avgTemp: +d.avgtempC,
+                }));
+                this.createChart();
+              } else {
+                console.error('Unexpected API response structure', data);
                 this.currentWeather = null;
               }
-            );
-          },
-          (error: any) => {
-            console.error('Error fetching city name', error); // Log city name API error
-            this.currentCity = `Lat ${lat.toFixed(2)} and Lon ${lon.toFixed(2)}`; // Fallback to coordinates
-            this.currentWeather = null;
-          }
-        );
-      },
-      (error) => {
-        console.error('Geolocation error:', error); // Log geolocation error
-
-        // Fallback: Use default location (New York, for example)
-        const fallbackLat = 40.7128;
-        const fallbackLon = -74.0060;
-        console.log(`Using fallback location: Lat ${fallbackLat}, Lon ${fallbackLon}`);
-
-        this.getCityAndWeather(fallbackLat, fallbackLon); // Use fallback location
-      }
-    );
-  }
-
-// Helper method to get city name and weather based on coordinates
-  getCityAndWeather(lat: number, lon: number): void {
-    this.weatherService.getCityNameFromCoordinates(lat, lon).subscribe(
-      (cityName) => {
-        console.log(`Fallback city name retrieved: ${cityName}`); // Log fallback city name
-        this.currentCity = cityName;
-
-        // Fetch weather data for the fallback city
-        this.weatherService.getWeather(this.currentCity).subscribe(
-          (data) => {
-            if (data && data.data && data.data.current_condition && data.data.weather) {
-              this.currentWeather = data.data.current_condition[0];
-              this.weatherStats = data.data.weather.map((d: any) => ({
-                date: new Date(d.date),
-                avgTemp: +d.avgtempC,
-              }));
-              console.log('Fallback weather data retrieved successfully:', this.currentWeather); // Log fallback weather data
-              this.createChart();
-            } else {
-              console.error('Unexpected API response structure', data);
+            },
+            (error: any) => {
+              console.error('Error fetching weather data', error);
               this.currentWeather = null;
             }
-          },
-          (error: any) => {
-            console.error('Error fetching fallback weather data', error); // Log fallback weather API error
-            this.currentWeather = null;
-          }
-        );
-      },
-      (error: any) => {
-        console.error('Error fetching fallback city name', error); // Log fallback city name error
-        this.currentCity = `Lat ${lat.toFixed(2)}, Lon ${lon.toFixed(2)}`; // Fallback to coordinates
-        this.currentWeather = null;
-      }
-    );
+          );
+        },
+        (error: any) => {
+          console.error('Error fetching city name', error);
+          this.currentCity = `Lat ${lat.toFixed(2)} and Lon ${lon.toFixed(2)}`; // Fallback to coordinates if API fails
+          this.currentWeather = null;
+        }
+      );
+    });
   }
-
 
   searchWeather(): void {
     this.router.navigate(['/city', this.searchCity]);
