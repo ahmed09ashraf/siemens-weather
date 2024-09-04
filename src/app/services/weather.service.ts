@@ -22,9 +22,6 @@ export class WeatherService {
       .set('format', 'json')
       .set('num_of_days', '7');
 
-    console.log(`Fetching weather data for city: ${cityName}`); // Log the city name
-
-
     return this.http.get(url, { params });
   }
 
@@ -39,12 +36,10 @@ export class WeatherService {
       .set('addressdetails', '1');
 
     const headers = new HttpHeaders().set('User-Agent', 'siemens-weather-app/1.0 (https://siemens-weather-65e5edbf3cd5.herokuapp.com/)');
-    console.log(`Fetching city name for coordinates: Lat ${lat}, Lon ${lon}`); // Log coordinates
 
 
     return this.http.get(url, { params }).pipe(
       map((response: any) => {
-        console.log('OpenStreetMap API response:', response); // Log the Nominatim API response
         return response.address.city || response.address.town || response.address.village || response.address.state || 'Unknown location';
       })
     );
