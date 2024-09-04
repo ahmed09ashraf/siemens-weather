@@ -197,9 +197,19 @@ export class LandingComponent implements OnInit {
       .domain([d3.min(data, d => d.value)! - 5, d3.max(data, d => d.value)! + 5])
       .range([height, 0]);
 
+    const xAxis = d3.axisBottom(x)
+      .ticks(data.length)  // Adjust the number of ticks to fit your data
+      .tickFormat((domainValue, index) => {
+        const date = domainValue instanceof Date ? domainValue : new Date(domainValue.valueOf());
+        if (index === data.length - 1) {
+          return d3.timeFormat('%b')(date); // Display month name only at the end
+        }
+        return d3.timeFormat('%d')(date); // Display day of the month for other ticks
+      });
+
     g.append('g')
       .attr('transform', `translate(0,${height})`)
-      .call(d3.axisBottom(x));
+      .call(xAxis);
 
     g.append('g')
       .call(d3.axisLeft(y));
