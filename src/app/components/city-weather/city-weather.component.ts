@@ -6,6 +6,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
 import moment from "moment/moment";
 
+
 @Component({
   selector: 'app-city-weather',
   standalone: true,
@@ -33,10 +34,13 @@ export class CityWeatherComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.cityName = this.route.snapshot.paramMap.get('cityName') || '';
+    this.cityName = (this.route.snapshot.paramMap.get('cityName') || '').toLowerCase(); // Force lowercase
     this.getWeatherData(this.cityName);
     this.initializeDate();
     this.checkIfFavorite();  // Check if the city is already a favorite
+    if (isPlatformBrowser(this.platformId)) {
+      window.scrollTo(0, 0);
+    }
   }
 
   initializeDate(): void {
@@ -51,30 +55,41 @@ export class CityWeatherComponent implements OnInit {
   }
 
   addToFavorites(): void {
-      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    const normalizedCityName = this.cityName.toLowerCase();  // Normalize city name
 
-      if (this.isFavorite) {
-        // If already favorite, remove it
-        const updatedFavorites = favorites.filter((city: any) => city.name !== this.cityName);
-        localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-      } else {
-        // Add to favorites
-        favorites.push({
-          name: this.cityName,
-          temperatureC: this.currentWeather?.temp_C,
-          temperatureF: this.currentWeather?.temp_F ,
-        });
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-      }
+    // Check if the city is already in the favorites
+    const isAlreadyFavorite = favorites.some((city: any) => city.name === normalizedCityName);
 
-      this.isFavorite = !this.isFavorite;
+    if (isAlreadyFavorite) {
+      // Remove from favorites if it's already there
+      favorites = favorites.filter((city: any) => city.name !== normalizedCityName);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      this.isFavorite = false;
+    } else {
+      // Add to favorites
+      favorites.push({
+        name: normalizedCityName,  // Use lowercase city name
+        temperatureC: this.currentWeather?.temp_C,
+        temperatureF: this.currentWeather?.temp_F,
+        weatherDesc: this.currentWeather?.weatherDesc?.[0]?.value
+      });
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      this.isFavorite = true;
     }
+  }
 
-  // Check if the current city is already a favorite
+
+
+// Check if the current city is already a favorite on component load
   checkIfFavorite(): void {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    this.isFavorite = favorites.some((city: any) => city.name === this.cityName);
+    const normalizedCityName = this.cityName.toLowerCase();
+    this.isFavorite = favorites.some((city: any) => city.name === normalizedCityName);
   }
+
+
+
 
   getWeatherData(cityName: string): void {
     this.weatherService.getWeather(cityName).subscribe(

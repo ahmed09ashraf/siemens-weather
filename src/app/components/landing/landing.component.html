@@ -1,8 +1,9 @@
 <div class="container d-flex flex-column align-items-center">
   <div class="search-bar d-flex justify-content-center mb-3 w-100 weather-card">
-    <input [(ngModel)]="searchCity" class="form-control me-5" placeholder="Enter city">
+    <input [(ngModel)]="searchCity" class="form-control me-5" placeholder="Enter city" (keyup.enter)="searchWeather()"/>
     <button (click)="searchWeather()" class="btn btn-warning">Search</button>
   </div>
+
 
   <!-- City Name, Temperature, and Weather Icon -->
   <div class="d-flex flex-row justify-content-around align-items-center weather-card col-12">
@@ -84,7 +85,7 @@
   <!-- Historical Data Chart -->
   <div class="weather-card col-12 d-flex flex-column align-items-center">
     <div class="text-center">
-      <h2 class="chart-title">Historical Weather Data</h2>
+      <h2 class="chart-title">Weather This Week</h2>
       <figure id="chart">
         <svg width="100%" height="200"></svg>
       </figure>
@@ -102,25 +103,25 @@
       (dragover)="onDragOver($event, i)"
       (dragend)="onDragEnd($event)"
       (drop)="onDrop($event, i)"
+      (click)="onCityClick(city.name)"
     >
-      <div class="weather-card col-12 position-relative" style="cursor: pointer;">
-        <!-- Favorite button in the top-left corner -->
-        <button class="favorite-btn" (click)="removeFromFavorites(city.name); $event.stopPropagation();" style="position: absolute; top: 10px; left: 10px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icon-tabler-heart filled">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"></path>
-          </svg>
-        </button>
+    <div class="weather-card col-12 position-relative" style="cursor: pointer;">
+      <!-- Favorite button in the top-left corner -->
+      <button class="favorite-btn" (click)="removeFromFavorites(city.name); $event.stopPropagation();" style="position: absolute; top: 10px; left: 10px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icon-tabler-heart filled">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+          <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"></path>
+        </svg>
+      </button>
 
-        <!-- City Details -->
-        <div class="d-flex flex-column justify-content-between align-items-center text-center mt-4">
-          <h3 style="text-transform: capitalize;">{{ city.name }}</h3>
-          <h3 class="details col-12 mt-2">{{ city.temperatureC }} °C</h3>
-        </div>
+      <!-- City Details -->
+      <div class="d-flex flex-column justify-content-between align-items-center text-center mt-4">
+        <h3 style="text-transform: capitalize;">{{ city.name }}</h3>
+        <h3 class="details col-12 mt-2">{{ city.temperatureC }} °C</h3>
       </div>
     </div>
   </div>
-
-
+</div>
 
 </div>
+

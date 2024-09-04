@@ -13,9 +13,9 @@ import moment from 'moment';
   templateUrl: './landing.component.html',
   imports: [
     FormsModule,
-    NgIf,
     NgClass,
-    NgForOf
+    NgForOf,
+    NgIf
   ],
   styleUrls: ['./landing.component.css']
 })
@@ -27,9 +27,8 @@ export class LandingComponent implements OnInit {
   temperatureUnit: string = 'C';
   favoriteCities: any[] = [];
   draggedCityIndex: number | null = null;
-  dragOverIndex: number | null = null;
   placeholderIndex: number | null = null;
-
+  dragging: boolean = false;
 
   dayOfWeek: string = '';
   dayOfMonth: string = '';
@@ -90,26 +89,26 @@ export class LandingComponent implements OnInit {
     }
   }
 
-
   onDragStart(event: DragEvent, index: number): void {
+    this.dragging = true;
     this.draggedCityIndex = index;
-
     const element = (event.target as HTMLElement);
-    element.style.opacity = '0.7'; // Reduce opacity for the original card during drag
-    element.classList.add('dragging-card'); // Add dragging class for visual effect
+    element.style.opacity = '0.3';
+    element.classList.add('dragging-card');
   }
 
   onDragEnd(event: DragEvent): void {
+    this.dragging = false;
     const element = event.target as HTMLElement;
-    element.style.opacity = '1'; // Reset opacity after dragging
-    element.classList.remove('dragging-card'); // Remove dragging class
-    this.draggedCityIndex = null; // Reset drag index
+    element.style.opacity = '1';
+    element.classList.remove('dragging-card');
+    this.draggedCityIndex = null;
     this.placeholderIndex = null;
   }
 
   onDragOver(event: DragEvent, index: number): void {
-    event.preventDefault(); // Allow drop
-    this.placeholderIndex = index; // Set index for where to drop
+    event.preventDefault();
+    this.placeholderIndex = index;
   }
 
   onDrop(event: DragEvent, dropIndex: number): void {
@@ -117,14 +116,13 @@ export class LandingComponent implements OnInit {
     const draggedIndex = this.draggedCityIndex;
     if (draggedIndex !== null) {
       const draggedCity = this.favoriteCities[draggedIndex];
-      this.favoriteCities.splice(draggedIndex, 1); // Remove from original position
-      this.favoriteCities.splice(dropIndex, 0, draggedCity); // Insert in new position
+      this.favoriteCities.splice(draggedIndex, 1);
+      this.favoriteCities.splice(dropIndex, 0, draggedCity);
       localStorage.setItem('favorites', JSON.stringify(this.favoriteCities));
     }
     this.draggedCityIndex = null;
     this.placeholderIndex = null;
   }
-
 
   // Remove a city from favorites
   removeFromFavorites(cityName: string): void {
@@ -132,7 +130,6 @@ export class LandingComponent implements OnInit {
     this.favoriteCities = updatedFavorites;
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
   }
-
 
   getUserLocation(): void {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -164,7 +161,7 @@ export class LandingComponent implements OnInit {
         },
         (error: any) => {
           console.error('Error fetching city name', error);
-          this.currentCity = `Lat ${lat.toFixed(2)} and Lon ${lon.toFixed(2)}`; // Fallback to coordinates if API fails
+          this.currentCity = `Lat ${lat.toFixed(2)} and Lon ${lon.toFixed(2)}`;
           this.currentWeather = null;
         }
       );
@@ -172,8 +169,9 @@ export class LandingComponent implements OnInit {
   }
 
   searchWeather(): void {
-    this.router.navigate(['/city', this.searchCity]);
+    this.router.navigate(['/city', this.searchCity.toLowerCase()]);
   }
+
 
   private createChart(): void {
     if (!this.weatherStats || this.weatherStats.length === 0) {
@@ -226,8 +224,10 @@ export class LandingComponent implements OnInit {
       .attr('fill', '#ffcc00');
   }
 
-  // Navigate to city from favorite card
-  navigateToCity(cityName: string): void {
-    this.router.navigate(['/city', cityName]);
+  // Navigate to city from favorite card (only on click, not on drag)
+  onCityClick(cityName: string): void {
+    if (!this.dragging) {  // If not dragging, navigate to the city
+      this.router.navigate(['/city', cityName.toLowerCase()]);  // Force lowercase in the URL
+    }
   }
 }
