@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams , HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {Observable, tap} from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
@@ -14,6 +14,7 @@ export class WeatherService {
 
   constructor(private http: HttpClient) {}
 
+
   getWeather(cityName: string): Observable<any> {
     const url = `${this.baseUrl}/weather.ashx`;
     const params = new HttpParams()
@@ -22,7 +23,11 @@ export class WeatherService {
       .set('format', 'json')
       .set('num_of_days', '7');
 
-    return this.http.get(url, { params });
+    return this.http.get(url, { params }).pipe(
+      tap(response => {
+        console.log('Weather API response:', response); // Log the response to the console
+      })
+    );
   }
 
   getCityNameFromCoordinates(lat: number, lon: number): Observable<any> {

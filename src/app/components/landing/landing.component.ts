@@ -34,6 +34,9 @@ export class LandingComponent implements OnInit {
   dayOfMonth: string = '';
   month: string = '';
 
+  errorMessage: string | null = null;  // Holds validation error messages
+  isLoading: boolean = false;  // To show a loading state if needed during API call
+
   constructor(
     private weatherService: WeatherService,
     private router: Router,
@@ -50,7 +53,7 @@ export class LandingComponent implements OnInit {
 
   initializeDate(): void {
     const today = moment();
-    this.dayOfWeek = today.format('ddd');
+    this.dayOfWeek = today.format('dddd');
     this.dayOfMonth = today.format('D');
     this.month = today.format('MMM');
   }
@@ -169,7 +172,41 @@ export class LandingComponent implements OnInit {
   }
 
   searchWeather(): void {
-    this.router.navigate(['/city', this.searchCity.toLowerCase()]);
+    this.errorMessage = null; // Clear any previous error messages
+
+    // 1. Trim the input and check if it's empty
+    const trimmedSearch = this.searchCity.trim();
+    if (!trimmedSearch) {
+      this.errorMessage = "You should enter a city name!";
+      return;
+    }
+
+    // 2. Validate the input for invalid characters (allow only letters)
+    const invalidCharsPattern = /[^a-zA-Z\s\u0600-\u06FF]/; // Allows Arabic and English alphabets
+    if (invalidCharsPattern.test(trimmedSearch)) {
+      this.errorMessage = "Invalid city name! Please use only letters.";
+      return;
+    }
+
+    // 3. Call the API to check if the city exists
+    this.isLoading = true;
+    this.weatherService.getWeather(trimmedSearch.toLowerCase()).subscribe(
+      (data) => {
+        this.isLoading = false;
+        if (data && data.data && data.data.current_condition) {
+          // If the city is valid, navigate to the city route (lowercase)
+          this.router.navigate(['/city', trimmedSearch.toLowerCase()]);
+        } else {
+          // If the API does not return valid data, show an error message
+          this.errorMessage = "The city does not exist. Please check the city name.";
+        }
+      },
+      (error) => {
+        this.isLoading = false;
+        this.errorMessage = "There was an error fetching the data. Please try again.";
+        console.error("API Error:", error);
+      }
+    );
   }
 
 
