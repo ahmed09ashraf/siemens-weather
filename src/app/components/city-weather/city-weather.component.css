@@ -10,8 +10,27 @@
 
 }
 
+
 .container {
-  width: 35%;
+  width: 40%;
+  transition: width 0.5s ease;
+}
+
+.expand-btn {
+  background: linear-gradient(145deg, #4a6572, #2f3d4a);
+  padding: 5px;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.4);
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  cursor: pointer;
+  position: absolute;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 20px;
+}
+
+.expand-btn:hover {
+  transform: scale(1.1); /* Slightly enlarge on hover */
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.6); /* Darker shadow on hover */
 }
 
 .weather-card {
@@ -169,14 +188,11 @@
 }
 
 
-@media screen and (max-width: 500px) {
-  .container {
-    width: 100%;
-  }
-}
 
 @media screen and (max-width: 768px) {
-
+.expand-btn{
+  display: none;
+}
 
   .humadity-text , .wind-text  {
     font-size: 12px ;
@@ -186,5 +202,7 @@
     padding: 2px;
   }
 
-
+  .weather-icon img {
+    width: 60px;
+  }
 }

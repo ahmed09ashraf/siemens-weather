@@ -19,7 +19,9 @@ export class CityWeatherComponent implements OnInit {
   currentWeather: any = {};
   weatherStats: any[] = [];
   temperatureUnit: string = 'C';
-  isFavorite: boolean = false; // To track the favorite status
+  isFavorite: boolean = false;
+  isExpanded: boolean = false;
+  isWebScreen: boolean = false;
 
 
   dayOfWeek: string = '';
@@ -37,10 +39,14 @@ export class CityWeatherComponent implements OnInit {
     this.cityName = (this.route.snapshot.paramMap.get('cityName') || '').toLowerCase(); // Force lowercase
     this.getWeatherData(this.cityName);
     this.initializeDate();
-    this.checkIfFavorite();  // Check if the city is already a favorite
+    this.checkIfFavorite();
     if (isPlatformBrowser(this.platformId)) {
       window.scrollTo(0, 0);
     }
+
+    this.updateScreenSize();
+    // Listen for window resize events
+    window.addEventListener('resize', this.updateScreenSize.bind(this));
   }
 
   initializeDate(): void {
@@ -52,6 +58,16 @@ export class CityWeatherComponent implements OnInit {
 
   setTemperatureUnit(unit: string): void {
     this.temperatureUnit = unit;
+  }
+
+  updateScreenSize(): void {
+    this.isWebScreen = window.innerWidth >= 768;
+  }
+
+  toggleExpand(): void {
+    if (this.isWebScreen) {
+      this.isExpanded = !this.isExpanded;
+    }
   }
 
   addToFavorites(): void {
@@ -69,7 +85,7 @@ export class CityWeatherComponent implements OnInit {
     } else {
       // Add to favorites
       favorites.push({
-        name: this.cityName,  
+        name: this.cityName,
         temperatureC: this.currentWeather?.temp_C,
         temperatureF: this.currentWeather?.temp_F,
         weatherDesc: this.currentWeather?.weatherDesc?.[0]?.value
@@ -81,15 +97,12 @@ export class CityWeatherComponent implements OnInit {
 
 
 
-// Check if the current city is already a favorite on component load
+  // Check if the current city is already a favorite on component load
   checkIfFavorite(): void {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
     const normalizedCityName = this.cityName.toLowerCase();
     this.isFavorite = favorites.some((city: any) => city.name.toLowerCase() === normalizedCityName);
   }
-
-
-
 
   getWeatherData(cityName: string): void {
     this.weatherService.getWeather(cityName).subscribe(
@@ -97,7 +110,7 @@ export class CityWeatherComponent implements OnInit {
         if (data && data.data && data.data.current_condition && data.data.weather) {
           // Split the query to extract only the city name
           const query = data.data.request?.[0]?.query || cityName;
-          this.cityName = query.split(',')[0].trim(); 
+          this.cityName = query.split(',')[0].trim();
 
           this.currentWeather = data.data.current_condition[0];
           this.weatherStats = data.data.weather.map((d: any) => ({

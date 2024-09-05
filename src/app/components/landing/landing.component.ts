@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { WeatherService } from '../../services/weather.service';
 import { Router } from '@angular/router';
-import {isPlatformBrowser, NgClass, NgForOf, NgIf} from '@angular/common';
+import {isPlatformBrowser, NgClass, NgForOf, NgIf, NgStyle} from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 import { FormsModule } from "@angular/forms";
 import * as d3 from 'd3';
@@ -15,7 +15,8 @@ import moment from 'moment';
     FormsModule,
     NgClass,
     NgForOf,
-    NgIf
+    NgIf,
+    NgStyle
   ],
   styleUrls: ['./landing.component.css']
 })
@@ -31,6 +32,9 @@ export class LandingComponent implements OnInit {
   dragging: boolean = false;
   touchStartX: number = 0;
   touchStartY: number = 0;
+  isExpanded: boolean = false;
+  isWebScreen: boolean = false;
+
 
   dayOfWeek: string = '';
   dayOfMonth: string = '';
@@ -51,6 +55,10 @@ export class LandingComponent implements OnInit {
     }
     this.initializeDate();
     this.loadFavorites();
+
+    this.updateScreenSize();
+    // Listen for window resize events
+    window.addEventListener('resize', this.updateScreenSize.bind(this));
   }
 
   initializeDate(): void {
@@ -69,7 +77,15 @@ export class LandingComponent implements OnInit {
     this.favoriteCities = JSON.parse(localStorage.getItem('favorites') || '[]');
   }
 
+  updateScreenSize(): void {
+    this.isWebScreen = window.innerWidth >= 768;
+  }
 
+  toggleExpand(): void {
+    if (this.isWebScreen) {
+      this.isExpanded = !this.isExpanded;
+    }
+  }
 
   onDragStart(event: DragEvent, index: number): void {
     this.dragging = true;
