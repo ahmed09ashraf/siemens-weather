@@ -45,7 +45,7 @@ export class CityWeatherComponent implements OnInit {
 
   initializeDate(): void {
     const today = moment();
-    this.dayOfWeek =today.format('ddd');
+    this.dayOfWeek =today.format('dddd');
     this.dayOfMonth = today.format('D');
     this.month = today.format('MMM');
   }
@@ -59,17 +59,17 @@ export class CityWeatherComponent implements OnInit {
     const normalizedCityName = this.cityName.toLowerCase();  // Normalize city name
 
     // Check if the city is already in the favorites
-    const isAlreadyFavorite = favorites.some((city: any) => city.name === normalizedCityName);
+    const isAlreadyFavorite = favorites.some((city: any) => city.name.toLowerCase() === normalizedCityName);
 
     if (isAlreadyFavorite) {
       // Remove from favorites if it's already there
-      favorites = favorites.filter((city: any) => city.name !== normalizedCityName);
+      favorites = favorites.filter((city: any) => city.name.toLowerCase() !== normalizedCityName);
       localStorage.setItem('favorites', JSON.stringify(favorites));
       this.isFavorite = false;
     } else {
       // Add to favorites
       favorites.push({
-        name: normalizedCityName,  // Use lowercase city name
+        name: this.cityName,  
         temperatureC: this.currentWeather?.temp_C,
         temperatureF: this.currentWeather?.temp_F,
         weatherDesc: this.currentWeather?.weatherDesc?.[0]?.value
@@ -85,7 +85,7 @@ export class CityWeatherComponent implements OnInit {
   checkIfFavorite(): void {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
     const normalizedCityName = this.cityName.toLowerCase();
-    this.isFavorite = favorites.some((city: any) => city.name === normalizedCityName);
+    this.isFavorite = favorites.some((city: any) => city.name.toLowerCase() === normalizedCityName);
   }
 
 
@@ -95,6 +95,10 @@ export class CityWeatherComponent implements OnInit {
     this.weatherService.getWeather(cityName).subscribe(
       (data) => {
         if (data && data.data && data.data.current_condition && data.data.weather) {
+          // Split the query to extract only the city name
+          const query = data.data.request?.[0]?.query || cityName;
+          this.cityName = query.split(',')[0].trim(); 
+
           this.currentWeather = data.data.current_condition[0];
           this.weatherStats = data.data.weather.map((d: any) => ({
             date: new Date(d.date),
