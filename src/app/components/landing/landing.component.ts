@@ -110,7 +110,7 @@ export class LandingComponent implements OnInit {
     this.dragging = true;
     this.draggedCityIndex = index;
 
-    // Store initial touch coordinates
+    // Store the initial touch position
     const touch = event.touches[0];
     this.touchStartX = touch.clientX;
     this.touchStartY = touch.clientY;
@@ -120,43 +120,42 @@ export class LandingComponent implements OnInit {
     element.classList.add('dragging-card');
   }
 
-  onTouchMove(event: TouchEvent, index: number): void {
-    event.preventDefault();  // Prevent default scroll behavior while dragging
+  onTouchMove(event: TouchEvent): void {
+    if (!this.dragging) return;
 
-    // Calculate touch movement
     const touch = event.touches[0];
     const deltaX = touch.clientX - this.touchStartX;
     const deltaY = touch.clientY - this.touchStartY;
 
-    // Move the element by changing its style or triggering some custom logic
     const element = event.target as HTMLElement;
     element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
 
-    // Update the placeholder index during the touch move (similar to dragOver)
-    this.placeholderIndex = index;
+    // Calculate which city is being hovered over based on touch movement
+    const hoveredElement = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (hoveredElement) {
+      const hoveredIndex = Array.from(hoveredElement.parentElement?.children || []).indexOf(hoveredElement);
+      if (hoveredIndex !== -1) {
+        this.placeholderIndex = hoveredIndex;
+      }
+    }
   }
 
-  onTouchEnd(event: TouchEvent): void {
-    // Reset dragging state
+  onTouchEnd(event: TouchEvent, index: number): void {
     this.dragging = false;
 
     const element = event.target as HTMLElement;
     element.style.opacity = '1';
+    element.style.transform = 'none';
     element.classList.remove('dragging-card');
-    element.style.transform = 'none';  // Reset the visual transformation
 
-    // If dragging finished, update the position of the dragged city
     if (this.draggedCityIndex !== null && this.placeholderIndex !== null && this.draggedCityIndex !== this.placeholderIndex) {
-      // Swap cities in the favoriteCities array
       const draggedCity = this.favoriteCities[this.draggedCityIndex];
-      this.favoriteCities.splice(this.draggedCityIndex, 1);  // Remove the dragged city
-      this.favoriteCities.splice(this.placeholderIndex, 0, draggedCity);  // Insert at the new position
+      this.favoriteCities.splice(this.draggedCityIndex, 1);
+      this.favoriteCities.splice(this.placeholderIndex, 0, draggedCity);
 
-      // Save updated order to localStorage
       localStorage.setItem('favorites', JSON.stringify(this.favoriteCities));
     }
 
-    // Reset the indices
     this.draggedCityIndex = null;
     this.placeholderIndex = null;
   }

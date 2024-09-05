@@ -124,8 +124,8 @@
       (dragend)="onDragEnd($event)"
       (drop)="onDrop($event, i)"
       (touchstart)="onTouchStart($event, i)"
-      (touchmove)="onTouchMove($event, i)"
-      (touchend)="onTouchEnd($event)"
+      (touchmove)="onTouchMove($event)"
+      (touchend)="onTouchEnd($event, i)"
       (click)="onCityClick(city.name)"
     >
       <div class="weather-card col-12 position-relative" style="cursor: pointer;">
