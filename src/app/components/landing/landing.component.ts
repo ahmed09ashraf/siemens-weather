@@ -147,6 +147,10 @@ export class LandingComponent implements OnInit {
     element.style.opacity = '1';
     element.style.transform = 'none';
     element.classList.remove('dragging-card');
+    element.blur();  // Remove the focus from the element
+
+    // Reset any visual highlighting or background changes
+    element.style.backgroundColor = '';  // Reset background color if modified
 
     if (this.draggedCityIndex !== null && this.placeholderIndex !== null && this.draggedCityIndex !== this.placeholderIndex) {
       const draggedCity = this.favoriteCities[this.draggedCityIndex];
