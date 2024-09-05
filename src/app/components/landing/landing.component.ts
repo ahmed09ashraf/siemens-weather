@@ -29,6 +29,8 @@ export class LandingComponent implements OnInit {
   draggedCityIndex: number | null = null;
   placeholderIndex: number | null = null;
   dragging: boolean = false;
+  touchStartX: number = 0;
+  touchStartY: number = 0;
 
   dayOfWeek: string = '';
   dayOfMonth: string = '';
@@ -67,30 +69,7 @@ export class LandingComponent implements OnInit {
     this.favoriteCities = JSON.parse(localStorage.getItem('favorites') || '[]');
   }
 
-  // Add or remove a city from favorites (this works similarly to CityWeatherComponent)
-  toggleFavorite(cityName: string): void {
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    const isFavorite = favorites.some((city: any) => city.name === cityName);
 
-    if (isFavorite) {
-      // Remove from favorites
-      const updatedFavorites = favorites.filter((city: any) => city.name !== cityName);
-      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-      this.favoriteCities = updatedFavorites;
-    } else {
-      // Add to favorites
-      this.weatherService.getWeather(cityName).subscribe((data) => {
-        const currentWeather = data?.data?.current_condition?.[0];
-        favorites.push({
-          name: cityName,
-          temperatureC: currentWeather?.temp_C,
-          temperatureF: currentWeather?.temp_F,
-        });
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-        this.favoriteCities = favorites;
-      });
-    }
-  }
 
   onDragStart(event: DragEvent, index: number): void {
     this.dragging = true;
@@ -123,6 +102,57 @@ export class LandingComponent implements OnInit {
       this.favoriteCities.splice(dropIndex, 0, draggedCity);
       localStorage.setItem('favorites', JSON.stringify(this.favoriteCities));
     }
+    this.draggedCityIndex = null;
+    this.placeholderIndex = null;
+  }
+
+  onTouchStart(event: TouchEvent, index: number): void {
+    this.dragging = true;
+    this.draggedCityIndex = index;
+
+    // Store initial touch coordinates
+    const touch = event.touches[0];
+    this.touchStartX = touch.clientX;
+    this.touchStartY = touch.clientY;
+
+    const element = event.target as HTMLElement;
+    element.style.opacity = '0.3';
+    element.classList.add('dragging-card');
+  }
+
+  onTouchMove(event: TouchEvent, index: number): void {
+    event.preventDefault();  // Prevent default scroll behavior while dragging
+
+    // Calculate touch movement
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - this.touchStartX;
+    const deltaY = touch.clientY - this.touchStartY;
+
+    // Move the element by changing its style or triggering some custom logic
+    const element = event.target as HTMLElement;
+    element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+    // Update the placeholder index during the touch move (similar to dragOver)
+    this.placeholderIndex = index;
+  }
+
+  onTouchEnd(event: TouchEvent): void {
+    this.dragging = false;
+
+    const element = event.target as HTMLElement;
+    element.style.opacity = '1';
+    element.classList.remove('dragging-card');
+    element.style.transform = 'none';  // Reset any transformations
+
+    // If dragging finished, update the position of the dragged city
+    if (this.draggedCityIndex !== null && this.placeholderIndex !== null) {
+      const draggedCity = this.favoriteCities[this.draggedCityIndex];
+      this.favoriteCities.splice(this.draggedCityIndex, 1);
+      this.favoriteCities.splice(this.placeholderIndex, 0, draggedCity);
+      localStorage.setItem('favorites', JSON.stringify(this.favoriteCities));
+    }
+
+    // Reset the indices
     this.draggedCityIndex = null;
     this.placeholderIndex = null;
   }
