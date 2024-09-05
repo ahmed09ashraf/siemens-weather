@@ -137,18 +137,22 @@ export class LandingComponent implements OnInit {
   }
 
   onTouchEnd(event: TouchEvent): void {
+    // Reset dragging state
     this.dragging = false;
 
     const element = event.target as HTMLElement;
     element.style.opacity = '1';
     element.classList.remove('dragging-card');
-    element.style.transform = 'none';  // Reset any transformations
+    element.style.transform = 'none';  // Reset the visual transformation
 
     // If dragging finished, update the position of the dragged city
-    if (this.draggedCityIndex !== null && this.placeholderIndex !== null) {
+    if (this.draggedCityIndex !== null && this.placeholderIndex !== null && this.draggedCityIndex !== this.placeholderIndex) {
+      // Swap cities in the favoriteCities array
       const draggedCity = this.favoriteCities[this.draggedCityIndex];
-      this.favoriteCities.splice(this.draggedCityIndex, 1);
-      this.favoriteCities.splice(this.placeholderIndex, 0, draggedCity);
+      this.favoriteCities.splice(this.draggedCityIndex, 1);  // Remove the dragged city
+      this.favoriteCities.splice(this.placeholderIndex, 0, draggedCity);  // Insert at the new position
+
+      // Save updated order to localStorage
       localStorage.setItem('favorites', JSON.stringify(this.favoriteCities));
     }
 
@@ -156,6 +160,7 @@ export class LandingComponent implements OnInit {
     this.draggedCityIndex = null;
     this.placeholderIndex = null;
   }
+
 
   // Remove a city from favorites
   removeFromFavorites(cityName: string): void {
