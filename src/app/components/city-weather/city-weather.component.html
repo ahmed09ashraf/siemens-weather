@@ -38,9 +38,18 @@
       </svg>
     </button>
 
+    <!-- Temperature Section -->
     <div class="col-md-4 col-sm-12 d-flex flex-column align-items-center text-center temp">
-      <h1 style="text-transform: capitalize;">{{ cityName }}</h1>
-      <p>{{ temperatureUnit === 'C' ? currentWeather?.temp_C + ' °c' : currentWeather?.temp_F + ' °f' }}</p>
+      <h1 style="text-transform: capitalize;">
+        {{ cityName ? cityName : 'Loading...' }}
+      </h1>
+      <p *ngIf="currentWeather?.temp_C || currentWeather?.temp_F; else noTemp">
+        {{ temperatureUnit === 'C' ? currentWeather?.temp_C + ' °c' : currentWeather?.temp_F + ' °f' }}
+      </p>
+      <ng-template #noTemp>
+        <p></p>
+      </ng-template>
+
       <div class="temperature-toggle mt-2">
         <button
           (click)="setTemperatureUnit('C')"
@@ -58,10 +67,14 @@
         </button>
       </div>
     </div>
+    <!-- Weather Icon Section-->
     <div class="d-flex flex-column justify-content-around align-items-center col-md-4">
       <figure class="col-md-12 text-center weather-icon">
-        <img [src]="currentWeather?.weatherIconUrl?.[0]?.value" alt="Weather Icon">
+        <img *ngIf="currentWeather?.weatherIconUrl?.[0]?.value; else noIcon" [src]="currentWeather?.weatherIconUrl?.[0]?.value" alt="Weather Icon">
       </figure>
+      <ng-template #noIcon>
+        <div></div>
+      </ng-template>
       <div class="col-md-12 text-center">
         <h3>{{ currentWeather?.weatherDesc?.[0]?.value }}</h3>
       </div>

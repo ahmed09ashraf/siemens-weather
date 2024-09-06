@@ -21,7 +21,7 @@ import moment from 'moment';
   styleUrls: ['./landing.component.css']
 })
 export class LandingComponent implements OnInit {
-  currentCity: string = 'Unknown';
+  currentCity: string = 'Loading...';
   currentWeather: any = {};
   searchCity: string = '';
   weatherStats: any[] = [];
@@ -40,8 +40,8 @@ export class LandingComponent implements OnInit {
   dayOfMonth: string = '';
   month: string = '';
 
-  errorMessage: string | null = null;  // Holds validation error messages
-  isLoading: boolean = false;  // To show a loading state if needed during API call
+  errorMessage: string | null = null;
+  isLoading: boolean = false;
 
   constructor(
     private weatherService: WeatherService,

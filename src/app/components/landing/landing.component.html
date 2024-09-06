@@ -33,30 +33,28 @@
         </svg>
       </span>
     </button>
+    <!-- Temperature Section -->
     <div class="col-md-4 d-flex flex-column align-items-center temp">
       <h1>{{ currentCity }}</h1>
-      <p>{{ temperatureUnit === 'C' ? currentWeather?.temp_C + ' °c' : currentWeather?.temp_F + ' °f' }}</p>
+      <p *ngIf="currentWeather?.temp_C || currentWeather?.temp_F; else noTemp">
+        {{ temperatureUnit === 'C' ? currentWeather?.temp_C + ' °c' : currentWeather?.temp_F + ' °f' }}
+      </p>
+      <ng-template #noTemp>
+        <p></p>
+      </ng-template>
       <div class="temperature-toggle mt-2">
-        <button
-          (click)="setTemperatureUnit('C')"
-          [ngClass]="{'selected': temperatureUnit === 'C'}"
-          class="toggle-btn"
-        >
-          °C
-        </button>
-        <button
-          (click)="setTemperatureUnit('F')"
-          [ngClass]="{'selected': temperatureUnit === 'F'}"
-          class="toggle-btn"
-        >
-          °F
-        </button>
+        <button (click)="setTemperatureUnit('C')" [ngClass]="{'selected': temperatureUnit === 'C'}" class="toggle-btn">°C</button>
+        <button (click)="setTemperatureUnit('F')" [ngClass]="{'selected': temperatureUnit === 'F'}" class="toggle-btn">°F</button>
       </div>
     </div>
+    <!-- Weather Icon Section -->
     <div class="d-flex flex-column justify-content-around align-items-center col-md-4">
       <figure class="col-md-12 text-center weather-icon">
-        <img [src]="currentWeather?.weatherIconUrl?.[0]?.value" alt="Weather Icon" />
+        <img *ngIf="currentWeather?.weatherIconUrl?.[0]?.value; else noIcon" [src]="currentWeather?.weatherIconUrl?.[0]?.value" alt="Weather Icon" />
       </figure>
+      <ng-template #noIcon>
+        <i class="text-warning">Please allow location access for accurate weather data.</i>
+      </ng-template>
       <div class="col-md-12 text-center">
         <h3>{{ currentWeather?.weatherDesc?.[0]?.value }}</h3>
       </div>
