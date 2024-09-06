@@ -18,17 +18,17 @@ This project is a single-page application (SPA) for weather forecasting, built u
 
 ## Technologies Used
 
-- **Angular** (v2+)
+- **Angular** 
 - **D3.js** for data visualization
 - **WorldWeatherOnline API** for fetching weather data
-- **Karma** and **Jasmine** for unit and e2e testing
+- **Karma** and **Jasmine** for unit testing
 - **Heroku** for deployment
 
 ## Installation and Setup
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/weather-app.git
+   git clone https://github.com/ahmed09ashraf/siemens-weather.git
    cd weather-app
    ```
 
@@ -41,24 +41,19 @@ This project is a single-page application (SPA) for weather forecasting, built u
    ```typescript
    export const environment = {
      production: false,
-     weatherApiKey: 'your_api_key_here',
+     weatherApiKey: '****',
      weatherApiBaseUrl: 'https://api.worldweatheronline.com/premium/v1'
    };
    ```
 
 4. Run the application locally:
    ```bash
-   ng serve
+   ng serve --o
    ```
 
 5. To run unit tests:
    ```bash
    ng test
-   ```
-
-6. To run e2e tests:
-   ```bash
-   ng e2e
    ```
 
 ## Deployment
@@ -80,10 +75,3 @@ The application is deployed on **Heroku**. To deploy it, follow these steps:
 ## API
 
 We use the [WorldWeatherOnline API](https://developer.worldweatheronline.com/) to fetch weather data. You need to sign up for an API key and add it to your environment variables.
-
-## Testing
-
-We use **Karma** and **Jasmine** for unit and e2e testing. To run the tests locally, execute:
-```bash
-ng test   # for unit tests
-```
