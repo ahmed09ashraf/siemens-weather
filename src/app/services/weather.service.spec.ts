@@ -18,19 +18,19 @@ describe('WeatherService', () => {
 
   it('should fetch weather data for a city', () => {
     const mockData = { data: { current_condition: [{ temp_C: 25 }] } };
-    service.getWeather('Doha').subscribe((data) => {
+    service.getWeather('Alexandria').subscribe((data) => {
       expect(data.data.current_condition[0].temp_C).toBe(25);
     });
 
     const req = httpMock.expectOne(
-      `${environment.weatherApiBaseUrl}/weather.ashx?q=Doha&key=${environment.weatherApiKey}&format=json&num_of_days=7`
+      `${environment.weatherApiBaseUrl}/weather.ashx?q=Alexandria&key=${environment.weatherApiKey}&format=json&num_of_days=7`
     );
     expect(req.request.method).toBe('GET');
     req.flush(mockData);
   });
 
   it('should get city name from coordinates', () => {
-    const mockCityName = 'Doha';
+    const mockCityName = 'Alexandria';
     service.getCityNameFromCoordinates(25.276987, 51.520008).subscribe((cityName) => {
       expect(cityName).toBe(mockCityName);
     });
