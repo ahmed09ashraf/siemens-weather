@@ -12,7 +12,7 @@ describe('CityWeatherComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CityWeatherComponent, HttpClientTestingModule], // Add CityWeatherComponent to imports
+      imports: [CityWeatherComponent, HttpClientTestingModule],
       providers: [
         WeatherService,
         {
@@ -20,7 +20,7 @@ describe('CityWeatherComponent', () => {
           useValue: {
             snapshot: {
               paramMap: {
-                get: () => 'doha', // Mock the city route parameter
+                get: () => 'alexandria',
               },
             },
           },
@@ -46,7 +46,7 @@ describe('CityWeatherComponent', () => {
 
     component.ngOnInit();
 
-    expect(weatherService.getWeather).toHaveBeenCalledWith('doha');
+    expect(weatherService.getWeather).toHaveBeenCalledWith('alexandria');
     expect(component.currentWeather.temp_C).toBe(25);
   });
 
@@ -59,7 +59,7 @@ describe('CityWeatherComponent', () => {
   });
 
   it('should add city to favorites', () => {
-    localStorage.clear(); // Clear previous data
+    localStorage.clear();
     spyOn(localStorage, 'setItem').and.callThrough();
 
     component.currentWeather = { temp_C: 25, temp_F: 77 };
@@ -67,6 +67,6 @@ describe('CityWeatherComponent', () => {
 
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
     expect(favorites.length).toBe(1);
-    expect(favorites[0].name).toBe('doha');
+    expect(favorites[0].name).toBe('alexandria');
   });
 });

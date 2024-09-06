@@ -13,7 +13,7 @@ describe('LandingComponent - Search Functionality', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LandingComponent, FormsModule, HttpClientTestingModule, RouterTestingModule], // Add LandingComponent to imports
+      imports: [LandingComponent, FormsModule, HttpClientTestingModule, RouterTestingModule],
       providers: [WeatherService]
     }).compileComponents();
 
@@ -25,15 +25,15 @@ describe('LandingComponent - Search Functionality', () => {
 
   // Test case for empty input
   it('should display an error if no city is entered', () => {
-    component.searchCity = ''; // Empty input
-    component.searchWeather(); // Call the search function
+    component.searchCity = '';
+    component.searchWeather();
     expect(component.errorMessage).toEqual('You should enter a city name!');
   });
 
   // Test case for invalid characters
   it('should display an error for invalid characters', () => {
-    component.searchCity = 'Doha123'; // Invalid input
-    component.searchWeather(); // Call the search function
+    component.searchCity = 'Alexandria123';
+    component.searchWeather();
     expect(component.errorMessage).toEqual('Invalid city name! Please use only letters.');
   });
 
@@ -43,20 +43,20 @@ describe('LandingComponent - Search Functionality', () => {
       data: { current_condition: [{ temp_C: 22 }] }
     }));
 
-    spyOn(component['router'], 'navigate'); // Spy on router navigation
+    spyOn(component['router'], 'navigate');
 
-    component.searchCity = 'Doha'; // Valid city name
+    component.searchCity = 'Alexandria';
     component.searchWeather();
 
-    expect(weatherService.getWeather).toHaveBeenCalledWith('doha');
-    expect(component['router'].navigate).toHaveBeenCalledWith(['/city', 'doha']);
+    expect(weatherService.getWeather).toHaveBeenCalledWith('alexandria');
+    expect(component['router'].navigate).toHaveBeenCalledWith(['/city', 'alexandria']);
   });
 
   // Test case for API error
   it('should display an error message if API returns error', () => {
     spyOn(weatherService, 'getWeather').and.returnValue(throwError('API error'));
 
-    component.searchCity = 'Doha'; // Valid city name
+    component.searchCity = 'Alexandria';
     component.searchWeather();
 
     expect(component.errorMessage).toEqual('There was an error fetching the data. Please try again.');
